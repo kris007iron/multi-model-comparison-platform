@@ -1,23 +1,50 @@
 from fastapi import FastAPI
 from transformers import pipeline, AutoModelForCausalLM
 from time import time
+from llamaapi import LlamaAPI
 
 app = FastAPI()
-text_generator = pipeline("text-generation")
-#AutoModelForCausalLM.from_pretrained("openchat/openchat_3.5")
+text_generator = pipeline("text-generation") #this too , model="openchat/openchat_3.5"
+#AutoModelForCausalLM.from_pretrained("openchat/openchat_3.5") for local model full functionality
+lApiToken = "LL-LalmintU3wY0xybcJHVuGrn7RF65Uhc89YYpsXjk9onnAagUtzv7Dr0eQmXQz8eq"
+llama = LlamaAPI(lApiToken)
+
 @app.get("/compare")
 def compare_models(query: str):
     start_time = time()
     local_model_response = text_generator(query, max_length=30)[0]['generated_text']
     end_time_local = time() - start_time
-
+    api_request_json = {
+    "messages": [
+        {"role": "user", "content": query},
+    ],
+    "functions": [
+        {
+            "name": "answer_question",
+            "description": "Answer a question based on a given context",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "question": {"type": "string"},
+                    "context": {"type": "string"},
+                },
+            },
+            "required": ["question", "context"],
+        }
+    ],
+    "stream": False,
+    "function_call": "answer_question",
+    }
+    start_time2 = time()
+    response = llama.run(api_request_json)
+    end_time_external = time() - start_time2
     # Add logic for external API (OpenAI, LlamaAPI) comparison here
 
     return {
         "local_model_response": local_model_response,
-        "external_model_response": "External API Response Placeholder",
+        "external_model_response": response.json(),
         "response_times": {
             "local_model": end_time_local,
-            "external_model": "External API Response Time Placeholder",
+            "external_model": end_time_external,
         },
     }
