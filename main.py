@@ -1,10 +1,10 @@
 from fastapi import FastAPI
-from transformers import pipeline
+from transformers import pipeline, AutoModelForCausalLM
 from time import time
 
 app = FastAPI()
 text_generator = pipeline("text-generation")
-
+#AutoModelForCausalLM.from_pretrained("openchat/openchat_3.5")
 @app.get("/compare")
 def compare_models(query: str):
     start_time = time()
