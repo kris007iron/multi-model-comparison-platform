@@ -51,3 +51,37 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+bin/
+lib/
+include/
+*.pyc
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# IDE
+.vscode/
+.idea/
+
+# Compiled Python files
+*.pyc
+
+# Miscellaneous
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
