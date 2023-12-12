@@ -3,7 +3,11 @@ import requests
 from transformers import pipeline, AutoModelForCausalLM
 from time import time
 from llamaapi import LlamaAPI
+from pydantic import BaseModel
 
+
+class Query(BaseModel):
+    query: str
 
 app = FastAPI()
 text_generator = pipeline("sentiment-analysis") #this too , model="openchat/openchat_3.5"
@@ -19,8 +23,8 @@ lApiToken = "LL-LalmintU3wY0xybcJHVuGrn7RF65Uhc89YYpsXjk9onnAagUtzv7Dr0eQmXQz8eq
 llama = LlamaAPI(lApiToken)
 
 
-@app.get("/compare")
-def compare_models(query: str):
+@app.post("/compare")
+def compare_models(query: Query):
     print(query)
     start_time = time()
     local_model_response = text_generator(query)#, max_length=30)[0]['generated_text']

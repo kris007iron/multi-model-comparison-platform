@@ -26,7 +26,7 @@
 
 <div class="row">
     <p id="note" class="col bg-dark text-white mx-1" @onclick="Compare">
-        Why are you dumb?
+        What do you think about coding?
     </p>
 </div>
 <div class="row justify-content-end">
@@ -35,15 +35,20 @@
 
 <script>
     function getText() {
-        return document.getElementById("note").value;
+        return document.getElementById("note").innerText;
     }
 </script>
 
 @code {
     public HttpClient httpClient = new HttpClient();
-    public string? response;
-    public async Task Compare(){
-        var text = await JS.InvokeAsync<string>("getText");
-        response = await httpClient.GetAsync("http://127.0.0.1:8000/compare?query="+ text).Result.Content.ReadAsStringAsync();;        
-    }
+public string? response;
+
+public async Task Compare()
+{
+    var text = await JS.InvokeAsync<string>("getText");
+
+    // Simplify data serialization using the string value directly
+    var query = new StringContent(text, System.Text.Encoding.UTF8, System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json"));
+    response = await httpClient.PostAsync("http://127.0.0.1:8000/compare", query).Result.Content.ReadAsStringAsync();
+}
 }
