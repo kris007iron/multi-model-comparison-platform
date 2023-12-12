@@ -21,6 +21,7 @@ llama = LlamaAPI(lApiToken)
 
 @app.get("/compare")
 def compare_models(query: str):
+    print(query)
     start_time = time()
     local_model_response = text_generator(query)#, max_length=30)[0]['generated_text']
     end_time_local = time() - start_time

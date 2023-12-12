@@ -1,4 +1,5 @@
 ﻿@page "/"
+@inject IJSRuntime JS
 
 <div class="row">
     <select name="remote" id="remote" class="form-select col mx-1">
@@ -16,17 +17,33 @@
     </p>
 
     <p id="localH" class="col bg-dark text-white mx-1">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aliquam ex nostrum perspiciatis excepturi debitis,
-        impedit ipsam ratione iusto qui eaque!
+        @if (response != null)
+        {
+            @response
+        }
     </p>
 </div>
 
 <div class="row">
-    <p id="note" class="col bg-dark text-white mx-1">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Aliquam ex nostrum perspiciatis excepturi debitis,
-        impedit ipsam ratione iusto qui eaque!
+    <p id="note" class="col bg-dark text-white mx-1" @onclick="Compare">
+        Why are you dumb?
     </p>
 </div>
 <div class="row justify-content-end">
     <button class="btn btn-dark btn-sm col-auto">Save history</button>
 </div>
+
+<script>
+    function getText() {
+        return document.getElementById("note").value;
+    }
+</script>
+
+@code {
+    public HttpClient httpClient = new HttpClient();
+    public string? response;
+    public async Task Compare(){
+        var text = await JS.InvokeAsync<string>("getText");
+        response = await httpClient.GetAsync("http://127.0.0.1:8000/compare?query="+ text).Result.Content.ReadAsStringAsync();;        
+    }
+}
