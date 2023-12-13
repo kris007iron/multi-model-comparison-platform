@@ -5,7 +5,6 @@ from time import time
 from llamaapi import LlamaAPI
 from pydantic import BaseModel
 
-
 class Item(BaseModel):
     query: str
 
@@ -26,12 +25,13 @@ llama = LlamaAPI(lApiToken)
 @app.post("/compare")
 def compare_models(item: Item):
     query = item.query
+    
     start_time = time()
     local_model_response = text_generator(query)#, max_length=30)[0]['generated_text']
     end_time_local = time() - start_time
     api_request_json = {
     "messages": [
-        {"role": "user", "content": query},
+        {"role": "assistant", "content": query},
     ],
     "functions": [
         {
@@ -51,19 +51,13 @@ def compare_models(item: Item):
     "function_call": "answer_question",
     }
     start_time2 = time()
-    response = llama.run(api_request_json)
+    #response = llama.run(api_request_json)
     end_time_external = time() - start_time2
     # Add logic for external API (OpenAI, LlamaAPI) comparison here
     start_time3 = time()
     responseh = query_h({"inputs": query})
     end_time_hugging = time() - start_time3
-    return {
-        "local_model_response": local_model_response,
-        "external_model_response": response.json(),
-        "external_huggingface_response": responseh,
-        "response_times": {
-            "local_model": end_time_local,
-            "external_model": end_time_external,
-            "external_huggingface": end_time_hugging,
-        },
+    return {        
+        "local_model": str(str(query) + str(local_model_response) + " " + str(end_time_local)),        
+        "external_huggingface": str(str(query) + str(responseh) + " " + str(end_time_hugging)),
     }
