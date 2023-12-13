@@ -6,7 +6,7 @@ from llamaapi import LlamaAPI
 from pydantic import BaseModel
 
 
-class Query(BaseModel):
+class Item(BaseModel):
     query: str
 
 app = FastAPI()
@@ -24,8 +24,8 @@ llama = LlamaAPI(lApiToken)
 
 
 @app.post("/compare")
-def compare_models(query: Query):
-    print(query)
+def compare_models(item: Item):
+    query = item.query
     start_time = time()
     local_model_response = text_generator(query)#, max_length=30)[0]['generated_text']
     end_time_local = time() - start_time

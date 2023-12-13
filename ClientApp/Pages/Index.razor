@@ -41,14 +41,25 @@
 
 @code {
     public HttpClient httpClient = new HttpClient();
-public string? response;
+    public string? response;
 
-public async Task Compare()
-{
-    var text = await JS.InvokeAsync<string>("getText");
+    public async Task Compare()
+    {
+        var text = await JS.InvokeAsync<string>("getText");
+        var data = new { query = text };
 
-    // Simplify data serialization using the string value directly
-    var query = new StringContent(text, System.Text.Encoding.UTF8, System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json"));
-    response = await httpClient.PostAsync("http://127.0.0.1:8000/compare", query).Result.Content.ReadAsStringAsync();
-}
+        var content = JsonContent.Create(data);
+        var response = await httpClient.PostAsync("http://127.0.0.1:8000/compare", content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            this.response = jsonResponse;
+        }
+        else
+        {
+            // Handle error status code
+            Console.WriteLine($"Failed to post data. Status code: {response.StatusCode}");
+        }
+    }
 }
