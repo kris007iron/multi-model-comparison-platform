@@ -12,15 +12,15 @@
 
 <div class="row">
     <p id="remoteH" class="col bg-dark text-white mx-1">
-        
+
     </p>
 
-    <p id="localH" class="col bg-dark text-white mx-1">                
+    <p id="localH" class="col bg-dark text-white mx-1">
     </p>
 </div>
 
 <div class="row">
-    <input type="text" id="note" class="col bg-dark text-white mx-1" @onclick="Compare">        
+    <input type="text" id="note" class="col bg-dark text-white mx-1" @onkeydown="Compare">
     </input>
 </div>
 <div class="row justify-content-end">
@@ -28,12 +28,18 @@
 </div>
 
 <script>
-    function getText() {
+    function getText()
+    {
         return document.getElementById("note").value;
     }
-    function setChats(remote, local) {
-        document.getElementById("remoteH").innerText +="\n" + remote;
-        document.getElementById("localH").innerText +="\n" + local;
+    function clearText()
+    {
+        document.getElementById("note").value = "";
+    }
+    function setChats(remote, local)
+    {
+        document.getElementById("remoteH").innerText += "\n" + remote;
+        document.getElementById("localH").innerText += "\n" + local;
     }
 </script>
 
@@ -41,9 +47,17 @@
     public HttpClient httpClient = new HttpClient();
     public Dictionary<string, string> response = new Dictionary<string, string>();
 
-    public async Task Compare()
+    public async Task Compare(KeyboardEventArgs e)
     {
+        if (e.Key != "Enter")
+        {
+            return;
+        }
         var text = await JS.InvokeAsync<string>("getText");
+        if (text == null || text == "")
+        {
+            return;
+        }
         var data = new { query = text };
 
         var content = JsonContent.Create(data);
@@ -61,5 +75,6 @@
             // Handle error status code
             Console.WriteLine($"Failed to post data. Status code: {response.StatusCode}");
         }
+        await JS.InvokeVoidAsync("clearText");
     }
 }
