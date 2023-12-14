@@ -4,11 +4,24 @@ from transformers import pipeline, AutoModelForCausalLM
 from time import time
 from llamaapi import LlamaAPI
 from pydantic import BaseModel
+from huggingface_hub import HfApi, ModelFilter
 
 class Item(BaseModel):
     query: str
+    # remote: str
+    # local: str
 
+api = HfApi()
 app = FastAPI()
+modelsids = []
+
+@app.get("/models")
+def get_models():
+    models = api.list_models(filter=ModelFilter(task="text-generation", library="transformers"), limit=10)
+    for model in models:
+        modelsids.append(model.id)
+    return modelsids
+
 text_generator = pipeline("sentiment-analysis") #this too , model="openchat/openchat_3.5"
 #remeote hugging face impl
 API_URL = "https://api-inference.huggingface.co/models/gpt2"
