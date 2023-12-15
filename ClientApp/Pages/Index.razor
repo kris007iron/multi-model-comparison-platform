@@ -58,7 +58,7 @@
         {
             return;
         }
-        var data = new { query = text };
+        var data = new { query = text, remote = "LLAMA", local = "sentime" };
 
         var content = JsonContent.Create(data);
         var response = await httpClient.PostAsync("http://127.0.0.1:8000/compare", content);
@@ -68,7 +68,7 @@
             var jsonResponse = await response.Content.ReadAsStringAsync();
             var responseDict = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonResponse);
             this.response = responseDict;
-            await JS.InvokeVoidAsync("setChats", responseDict["external_huggingface"], responseDict["local_model"]);
+            await JS.InvokeVoidAsync("setChats", responseDict?["external_huggingface"], responseDict?["local_model"]);
         }
         else
         {

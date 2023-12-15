@@ -8,8 +8,8 @@ from huggingface_hub import HfApi, ModelFilter
 
 class Item(BaseModel):
     query: str
-    # remote: str
-    # local: str
+    remote: str
+    local: str
 
 api = HfApi()
 app = FastAPI()
