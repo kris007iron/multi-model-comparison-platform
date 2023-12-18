@@ -5,6 +5,10 @@ from time import time
 from llamaapi import LlamaAPI
 from pydantic import BaseModel
 from huggingface_hub import HfApi, ModelFilter
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Item(BaseModel):
     query: str
@@ -61,12 +65,12 @@ def query_h(payload, model):
         }
         return llama.run(api_request_json).json()
     API_URL = str("https://api-inference.huggingface.co/models/" + model)
-    headers = {"Authorization": "Bearer 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"}
+    headers = {"Authorization": str("Bearer " + os.getenv("header"))}
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
 
 #AutoModelForCausalLM.from_pretrained("openchat/openchat_3.5") for local model full functionality
-lApiToken = "LL-LalmintU3wY0xybcJHVuGrn7RF65Uhc89YYpsXjk9onnAagUtzv7Dr0eQmXQz8eq"
+lApiToken = os.getenv("lApiToken")
 llama = LlamaAPI(lApiToken)
 
 
@@ -83,7 +87,6 @@ def compare_models(item: Item):
     responseh = query_h({"inputs": query}, item.remote)
     end_time_hugging = time() - start_time3
     return {   
-
-        "local_model": str(str(query) + str(item.local) + str(local_model_response) + " " + str(end_time_local)),        
-        "external_huggingface": str(str(query) + str(item.remote) + str(responseh) + " " + str(end_time_hugging)),
+        "local_model": str(str(query) + " " + str(local_model_response) + " " + "time:" + str(end_time_local)),        
+        "external_huggingface": str(str(query) + " " + str(responseh) + " " + + "time:" + + str(end_time_hugging)),
     }

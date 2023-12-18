@@ -33,6 +33,12 @@
         document.getElementById("note").value = "";
     }
     function setChats(remote, local) {
+        remote = remote.replaceAll(" ", "<br>");
+        local = local.replaceAll(" ", "<br>");
+        remote = remote.replaceAll("{", "");
+        remote = remote.replaceAll("}", "");
+        local = local.replaceAll("{", "");
+        local = local.replaceAll("}", "");
         document.getElementById("remoteH").innerText += "\n" + remote;
         document.getElementById("localH").innerText += "\n" + local;
     }
