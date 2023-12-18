@@ -26,15 +26,16 @@
 </div>
 
 <script>
-    function getText() {
+    function getText()
+    {
         return document.getElementById("note").value;
     }
-    function clearText() {
+    function clearText()
+    {
         document.getElementById("note").value = "";
     }
-    function setChats(remote, local) {
-        remote = remote.replaceAll(" ", "<br>");
-        local = local.replaceAll(" ", "<br>");
+    function setChats(remote, local)
+    {
         remote = remote.replaceAll("{", "");
         remote = remote.replaceAll("}", "");
         local = local.replaceAll("{", "");
@@ -42,28 +43,34 @@
         document.getElementById("remoteH").innerText += "\n" + remote;
         document.getElementById("localH").innerText += "\n" + local;
     }
-    function setRemoteModels(models) {
+    function setRemoteModels(models)
+    {
         var select = document.getElementById("remote");
-        for (var i = 0; i < models.length; i++) {
+        for (var i = 0; i < models.length; i++)
+        {
             var opt = document.createElement("option");
             opt.value = models[i];
             opt.innerHTML = models[i];
             select.appendChild(opt);
         }
     }
-    function setLocalModels(models) {
+    function setLocalModels(models)
+    {
         var select = document.getElementById("local");
-        for (var i = 0; i < models.length; i++) {
+        for (var i = 0; i < models.length; i++)
+        {
             var opt = document.createElement("option");
             opt.value = models[i];
             opt.innerHTML = models[i];
             select.appendChild(opt);
         }
     }
-    function remoteModel() {
+    function remoteModel()
+    {
         return document.getElementById("remote").value;
     }
-    function localModel() {
+    function localModel()
+    {
         return document.getElementById("local").value;
     }
 </script>

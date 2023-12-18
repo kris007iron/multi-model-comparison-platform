@@ -63,11 +63,12 @@ def query_h(payload, model):
         "stream": False,
         "function_call": "answer_question",
         }
-        return llama.run(api_request_json).json()
+        response = llama.run(api_request_json)
+        return response["messages"][0]["content"]
     API_URL = str("https://api-inference.huggingface.co/models/" + model)
     headers = {"Authorization": str("Bearer " + os.getenv("header"))}
     response = requests.post(API_URL, headers=headers, json=payload)
-    return response.json()
+    return response.json()[0]['generated_text']
 
 #AutoModelForCausalLM.from_pretrained("openchat/openchat_3.5") for local model full functionality
 lApiToken = os.getenv("lApiToken")
@@ -79,7 +80,7 @@ def compare_models(item: Item):
     query = item.query
     text_generator = pipeline("text-generation", model=str(item.local))
     start_time = time()
-    local_model_response = text_generator(query)#, max_length=30)[0]['generated_text']
+    local_model_response = text_generator(query)[0]['generated_text']
     end_time_local = time() - start_time
    
     # Add logic for external API (OpenAI, LlamaAPI) comparison here
@@ -87,6 +88,6 @@ def compare_models(item: Item):
     responseh = query_h({"inputs": query}, item.remote)
     end_time_hugging = time() - start_time3
     return {   
-        "local_model": str(str(query) + " " + str(local_model_response) + " " + "time:" + str(end_time_local)),        
-        "external_huggingface": str(str(query) + " " + str(responseh) + " " + + "time:" + + str(end_time_hugging)),
+        "local_model": str(str(query) + "\n" + str(local_model_response) + "\ntime:" + str(end_time_local)),        
+        "external_huggingface": str(str(query) + "\n" + str(responseh) + "\ntime:" + str(end_time_hugging)),
     }
