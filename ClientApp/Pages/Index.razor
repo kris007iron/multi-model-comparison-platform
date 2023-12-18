@@ -3,18 +3,17 @@
 
 <div class="row">
     <select name="remote" id="remote" class="form-select col mx-1">
-        <option value="LLAMA" selected>LLAMA</option>
     </select>
-    <select name="local" id="local" class="form-select col mx-1">        
+    <select name="local" id="local" class="form-select col mx-1">
     </select>
 </div>
 
 <div class="row">
-    <p id="remoteH" class="col bg-dark text-white mx-1">
+    <p id="remoteH" class="col bg-dark text-white mx-1" style="overflow: scroll; height: 200px">
 
     </p>
 
-    <p id="localH" class="col bg-dark text-white mx-1">
+    <p id="localH" class="col bg-dark text-white mx-1" style="overflow: scroll; height: 200px">
     </p>
 </div>
 
@@ -27,29 +26,39 @@
 </div>
 
 <script>
-    function getText()
-    {
+    function getText() {
         return document.getElementById("note").value;
     }
-    function clearText()
-    {
+    function clearText() {
         document.getElementById("note").value = "";
     }
-    function setChats(remote, local)
-    {
+    function setChats(remote, local) {
         document.getElementById("remoteH").innerText += "\n" + remote;
         document.getElementById("localH").innerText += "\n" + local;
     }
-    function setRemoteModels(models)
-    {
-        var select = document.getElementById("local");
-        for (var i = 0; i < models.length; i++)
-        {
+    function setRemoteModels(models) {
+        var select = document.getElementById("remote");
+        for (var i = 0; i < models.length; i++) {
             var opt = document.createElement("option");
             opt.value = models[i];
             opt.innerHTML = models[i];
             select.appendChild(opt);
         }
+    }
+    function setLocalModels(models) {
+        var select = document.getElementById("local");
+        for (var i = 0; i < models.length; i++) {
+            var opt = document.createElement("option");
+            opt.value = models[i];
+            opt.innerHTML = models[i];
+            select.appendChild(opt);
+        }
+    }
+    function remoteModel() {
+        return document.getElementById("remote").value;
+    }
+    function localModel() {
+        return document.getElementById("local").value;
     }
 </script>
 
@@ -68,7 +77,9 @@
         {
             return;
         }
-        var data = new { query = text, remote = "LLAMA", local = "sentime" };
+        string remoteModel = await JS.InvokeAsync<string>("remoteModel");
+        string localModel = await JS.InvokeAsync<string>("localModel");
+        var data = new { query = text, remote = remoteModel, local = localModel };
 
         var content = JsonContent.Create(data);
         var response = await httpClient.PostAsync("http://127.0.0.1:8000/compare", content);
@@ -94,6 +105,19 @@
         if (response.IsSuccessStatusCode)
         {
             var jsonResponse = await response.Content.ReadAsStringAsync();
+            var responseDict = JsonSerializer.Deserialize<List<string>>(jsonResponse);
+            await JS.InvokeVoidAsync("setLocalModels", responseDict);
+        }
+        else
+        {
+            // Handle error status code
+            Console.WriteLine($"Failed to post data. Status code: {response.StatusCode}");
+        }
+        var response2 = await httpClient.GetAsync("http://127.0.0.1:8000/remotemodels");
+        //make response a table of strings
+        if (response2.IsSuccessStatusCode)
+        {
+            var jsonResponse = await response2.Content.ReadAsStringAsync();
             var responseDict = JsonSerializer.Deserialize<List<string>>(jsonResponse);
             await JS.InvokeVoidAsync("setRemoteModels", responseDict);
         }
