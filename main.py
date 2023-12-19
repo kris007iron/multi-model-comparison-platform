@@ -1,14 +1,11 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 import requests
-from fastapi.responses import FileResponse
-from transformers import pipeline, AutoModelForCausalLM
+from transformers import pipeline
 from time import time
 from llamaapi import LlamaAPI
 from pydantic import BaseModel
 from huggingface_hub import HfApi, ModelFilter
 import os
-from io import BytesIO
-import json
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -80,7 +77,6 @@ def query_h(payload, model):
 #AutoModelForCausalLM.from_pretrained("openchat/openchat_3.5") for local model full functionality
 lApiToken = os.getenv("lApiToken")
 llama = LlamaAPI(lApiToken)
-
 
 @app.post("/compare")
 def compare_models(item: Item):
