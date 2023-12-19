@@ -1,0 +1,13 @@
+version: '3'
+services:
+  fastapi:
+    build:
+      context: ./BackEnd
+    ports:
+      - "8000:8000"
+
+  blazor:
+    build:
+      context: ./ClientApp
+    ports:
+      - "5138:5138"

@@ -1,0 +1,19 @@
+# Dockerfile for Blazor .NET
+
+# Use the official .NET SDK image as a parent image
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Expose port 5000 to the outside world
+EXPOSE 5138
+
+# Build the Blazor app
+RUN dotnet publish -c Release -o out
+
+# Define the entry point for the container
+ENTRYPOINT ["dotnet", "out/ClientApp.dll"]

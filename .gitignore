@@ -66,10 +66,6 @@ lib/
 include/
 *.pyc
 
-# Docker
-Dockerfile
-docker-compose.yml
-
 # IDE
 .vscode/
 .idea/
