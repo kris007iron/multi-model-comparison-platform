@@ -10,4 +10,6 @@ services:
     build:
       context: ./ClientApp
     ports:
-      - "5138:5138"
+      - "8080:8080"
+    depends_on:
+      - fastapi

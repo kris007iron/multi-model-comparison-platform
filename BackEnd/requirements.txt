@@ -1,8 +1,8 @@
-fastapi
 uvicorn
+fastapi
+requests
 transformers
-time
 llamaapi
 pydantic
-huggingface_hub
-python_dotenv
+huggingface-hub
+python-dotenv

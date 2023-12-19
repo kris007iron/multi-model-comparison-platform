@@ -10,7 +10,7 @@ WORKDIR /app
 COPY . /app
 
 # Expose port 5000 to the outside world
-EXPOSE 5138
+EXPOSE 8080:8080
 
 # Build the Blazor app
 RUN dotnet publish -c Release -o out

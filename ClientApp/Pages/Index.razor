@@ -26,49 +26,61 @@
 </div>
 
 <script>
-    function getText() {
+    function getText()
+    {
         return document.getElementById("note").value;
     }
-    function clearText() {
+    function clearText()
+    {
         document.getElementById("note").value = "";
     }
-    function setChats(remote, local) {
+    function setChats(remote, local)
+    {
         document.getElementById("remoteH").innerText += "\n" + remote;
         document.getElementById("localH").innerText += "\n" + local;
     }
-    function setRemoteModels(models) {
+    function setRemoteModels(models)
+    {
         var select = document.getElementById("remote");
-        for (var i = 0; i < models.length; i++) {
+        for (var i = 0; i < models.length; i++)
+        {
             var opt = document.createElement("option");
             opt.value = models[i];
             opt.innerHTML = models[i];
             select.appendChild(opt);
         }
     }
-    function setLocalModels(models) {
+    function setLocalModels(models)
+    {
         var select = document.getElementById("local");
-        for (var i = 0; i < models.length; i++) {
+        for (var i = 0; i < models.length; i++)
+        {
             var opt = document.createElement("option");
             opt.value = models[i];
             opt.innerHTML = models[i];
             select.appendChild(opt);
         }
     }
-    function remoteModel() {
+    function remoteModel()
+    {
         return document.getElementById("remote").value;
     }
-    function localModel() {
+    function localModel()
+    {
         return document.getElementById("local").value;
     }
-    function getLocalChats() {
+    function getLocalChats()
+    {
         console.log(document.getElementById("localH").innerText);
         return document.getElementById("localH").innerText;
     }
-    function getRemoteChats() {
+    function getRemoteChats()
+    {
         console.log(document.getElementById("remoteH").innerText);
         return document.getElementById("remoteH").innerText;
     }
-    function saveAsFile(byteArray, fileName) {
+    function saveAsFile(byteArray, fileName)
+    {
         const url = URL.createObjectURL(new Blob([byteArray], { type: "text/plain" }));
         const link = document.createElement("a");
         link.href = url;
@@ -77,7 +89,8 @@
         URL.revokeObjectURL(url);
         link.remove();
     }
-    function saveFile(data, fileName) {
+    function saveFile(data, fileName)
+    {
         const byteArray = new TextEncoder().encode(data);
         saveAsFile(byteArray, fileName);
     }
@@ -103,7 +116,7 @@
         var data = new { query = text, remote = remoteModel, local = localModel };
 
         var content = JsonContent.Create(data);
-        var response = await httpClient.PostAsync("http://127.0.0.1:8000/compare", content);
+        var response = await httpClient.PostAsync("http://fastapi:8000/compare", content);
 
         if (response.IsSuccessStatusCode)
         {
@@ -121,7 +134,7 @@
     }
     public async Task GetAvailableModels()
     {
-        var response = await httpClient.GetAsync("http://127.0.0.1:8000/models");
+        var response = await httpClient.GetAsync("http://fastapi:8000/models");
         //make response a table of strings
         if (response.IsSuccessStatusCode)
         {
@@ -134,7 +147,7 @@
             // Handle error status code
             Console.WriteLine($"Failed to post data. Status code: {response.StatusCode}");
         }
-        var response2 = await httpClient.GetAsync("http://127.0.0.1:8000/remotemodels");
+        var response2 = await httpClient.GetAsync("http://fastapi:8000/remotemodels");
         //make response a table of strings
         if (response2.IsSuccessStatusCode)
         {
