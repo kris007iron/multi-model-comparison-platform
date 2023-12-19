@@ -22,56 +22,64 @@
     </input>
 </div>
 <div class="row justify-content-end">
-    <button class="btn btn-dark btn-sm col-auto">Save history</button>
+    <button class="btn btn-dark btn-sm col-auto" @onclick="Save">Save history</button>
 </div>
 
 <script>
-    function getText()
-    {
+    function getText() {
         return document.getElementById("note").value;
     }
-    function clearText()
-    {
+    function clearText() {
         document.getElementById("note").value = "";
     }
-    function setChats(remote, local)
-    {
-        remote = remote.replaceAll("{", "");
-        remote = remote.replaceAll("}", "");
-        local = local.replaceAll("{", "");
-        local = local.replaceAll("}", "");
+    function setChats(remote, local) {
         document.getElementById("remoteH").innerText += "\n" + remote;
         document.getElementById("localH").innerText += "\n" + local;
     }
-    function setRemoteModels(models)
-    {
+    function setRemoteModels(models) {
         var select = document.getElementById("remote");
-        for (var i = 0; i < models.length; i++)
-        {
+        for (var i = 0; i < models.length; i++) {
             var opt = document.createElement("option");
             opt.value = models[i];
             opt.innerHTML = models[i];
             select.appendChild(opt);
         }
     }
-    function setLocalModels(models)
-    {
+    function setLocalModels(models) {
         var select = document.getElementById("local");
-        for (var i = 0; i < models.length; i++)
-        {
+        for (var i = 0; i < models.length; i++) {
             var opt = document.createElement("option");
             opt.value = models[i];
             opt.innerHTML = models[i];
             select.appendChild(opt);
         }
     }
-    function remoteModel()
-    {
+    function remoteModel() {
         return document.getElementById("remote").value;
     }
-    function localModel()
-    {
+    function localModel() {
         return document.getElementById("local").value;
+    }
+    function getLocalChats() {
+        console.log(document.getElementById("localH").innerText);
+        return document.getElementById("localH").innerText;
+    }
+    function getRemoteChats() {
+        console.log(document.getElementById("remoteH").innerText);
+        return document.getElementById("remoteH").innerText;
+    }
+    function saveAsFile(byteArray, fileName) {
+        const url = URL.createObjectURL(new Blob([byteArray], { type: "text/plain" }));
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(url);
+        link.remove();
+    }
+    function saveFile(data, fileName) {
+        const byteArray = new TextEncoder().encode(data);
+        saveAsFile(byteArray, fileName);
     }
 </script>
 
@@ -146,5 +154,11 @@
         {
             await GetAvailableModels();
         }
+    }
+    public async Task Save()
+    {
+        var data = "Remote:\n" + await JS.InvokeAsync<string>("getRemoteChats") + "\nLocal:\n" +
+        await JS.InvokeAsync<string>("getLocalChats");
+        await JS.InvokeVoidAsync("saveFile", data, "history.txt");
     }
 }

@@ -1,17 +1,24 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 import requests
+from fastapi.responses import FileResponse
 from transformers import pipeline, AutoModelForCausalLM
 from time import time
 from llamaapi import LlamaAPI
 from pydantic import BaseModel
 from huggingface_hub import HfApi, ModelFilter
 import os
+from io import BytesIO
+import json
 from dotenv import load_dotenv
 
 load_dotenv()
 
 class Item(BaseModel):
     query: str
+    remote: str
+    local: str
+
+class Chats(BaseModel):
     remote: str
     local: str
 
