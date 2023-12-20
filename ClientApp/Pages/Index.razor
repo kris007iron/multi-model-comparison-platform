@@ -2,9 +2,9 @@
 @inject IJSRuntime JS
 
 <div class="row">
-    <select name="remote" id="remote" class="form-select col mx-1">
+    <select name="remote" id="remote" class="form-select col mx-1" @onchange="ClearRemote">
     </select>
-    <select name="local" id="local" class="form-select col mx-1">
+    <select name="local" id="local" class="form-select col mx-1" @onchange="ClearLocal">
     </select>
 </div>
 
@@ -79,6 +79,14 @@
         console.log(document.getElementById("remoteH").innerText);
         return document.getElementById("remoteH").innerText;
     }
+    function clearChatsR()
+    {
+        document.getElementById("remoteH").innerText = "";
+    }
+    function clearChatsL()
+    {
+        document.getElementById("localH").innerText = "";
+    }
     function saveAsFile(byteArray, fileName)
     {
         const url = URL.createObjectURL(new Blob([byteArray], { type: "text/plain" }));
@@ -98,6 +106,7 @@
 
 @code {
     public HttpClient httpClient = new HttpClient();
+    public string api = "http://fastapi:8000";
     public Dictionary<string, string>? response = new Dictionary<string, string>();
 
     public async Task Compare(KeyboardEventArgs e)
@@ -116,7 +125,7 @@
         var data = new { query = text, remote = remoteModel, local = localModel };
 
         var content = JsonContent.Create(data);
-        var response = await httpClient.PostAsync("http://fastapi:8000/compare", content);
+        var response = await httpClient.PostAsync(api + "/compare", content);
 
         if (response.IsSuccessStatusCode)
         {
@@ -134,7 +143,7 @@
     }
     public async Task GetAvailableModels()
     {
-        var response = await httpClient.GetAsync("http://fastapi:8000/models");
+        var response = await httpClient.GetAsync(api + "/models");
         //make response a table of strings
         if (response.IsSuccessStatusCode)
         {
@@ -147,7 +156,7 @@
             // Handle error status code
             Console.WriteLine($"Failed to post data. Status code: {response.StatusCode}");
         }
-        var response2 = await httpClient.GetAsync("http://fastapi:8000/remotemodels");
+        var response2 = await httpClient.GetAsync(api + "/remotemodels");
         //make response a table of strings
         if (response2.IsSuccessStatusCode)
         {
@@ -173,5 +182,15 @@
         var data = "Remote:\n" + await JS.InvokeAsync<string>("getRemoteChats") + "\nLocal:\n" +
         await JS.InvokeAsync<string>("getLocalChats");
         await JS.InvokeVoidAsync("saveFile", data, "history.txt");
+    }
+
+    public async Task ClearLocal()
+    {
+        await JS.InvokeVoidAsync("clearChatsL");
+    }
+
+    public async Task ClearRemote()
+    {
+        await JS.InvokeVoidAsync("clearChatsR");
     }
 }

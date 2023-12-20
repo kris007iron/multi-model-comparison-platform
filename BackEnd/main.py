@@ -20,27 +20,29 @@ class Chats(BaseModel):
     local: str
 
 api = HfApi()
-app = FastAPI()
 modelsids = []
 remotemodels = ["llama"]
-@app.get("/models")
 def get_models():
-    if len(modelsids) > 0:
-        return modelsids
     models = api.list_models(filter=ModelFilter(task="text-generation", library="transformers"), limit=100, sort="downloads", direction=-1)
     for model in models:
         modelsids.append(model.id)
-    return modelsids
-
-@app.get("/remotemodels")
-def get_remote_models():
-    if len(remotemodels) > 1:
-        return remotemodels
     models = api.list_models(filter=ModelFilter(tags="text-generation-inference"), sort="downloads", direction=-1, limit=100)
     for model in models:
         if model.modelId not in remotemodels:
             remotemodels.append(model.modelId)
-    return remotemodels
+
+get_models()
+
+app = FastAPI()
+
+
+@app.get("/models")
+def get_models():
+    return modelsids
+
+@app.get("/remotemodels")
+def get_remote_models():
+        return remotemodels
  #this too , model="openchat/openchat_3.5"
 #remeote hugging face impl
 
@@ -53,22 +55,21 @@ def query_h(payload, model):
         "functions": [
             {
                 "name": "answer_question",
-                "description": "Answer a question based on a given context",
+                "description": "Answer a question based on your knowledge base.",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "question": {"type": "string"},
-                        "context": {"type": "string"},
+                        "question": {"type": "string"},                        
                     },
                 },
-                "required": ["question", "context"],
+                "required": ["question"],
             }
         ],
         "stream": False,
         "function_call": "answer_question",
         }
         response = llama.run(api_request_json)
-        return response["messages"][0]["content"]
+        return response.json()
     API_URL = str("https://api-inference.huggingface.co/models/" + model)
     headers = {"Authorization": str("Bearer " + os.getenv("header"))}
     response = requests.post(API_URL, headers=headers, json=payload)
